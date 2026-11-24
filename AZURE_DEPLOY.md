@@ -19,16 +19,16 @@ Budget about 40 minutes, including the first deploy.
 ## 1. Push the project to GitHub
 
 ```bash
-cd ai-capsule
+cd "CSE3CWA Assessment 3"
 git add .
 git commit -m "AI Capsule: full-stack prompt manager with OAuth, JWT and SQLite"
-gh repo create ai-capsule --public --source=. --push
+gh repo create CSE3CWA-Assessment-3 --public --source=. --push
 ```
 
 Or create the repository in the GitHub UI and:
 
 ```bash
-git remote add origin https://github.com/<username>/ai-capsule.git
+git remote add origin https://github.com/ltu-23025505/CSE3CWA-Assessment-3.git
 git branch -M main
 git push -u origin main
 ```
@@ -54,8 +54,8 @@ git grep -n "GITHUB_CLIENT_SECRET\|JWT_SECRET=" $(git rev-parse HEAD) -- . || ec
 | Field | Value |
 |---|---|
 | Subscription | Azure for Students |
-| Resource group | `ai-capsule-rg` (create new) |
-| Name | `ai-capsule-<yourname>` → becomes `ai-capsule-<yourname>.azurewebsites.net` |
+| Resource group | `cse3cwa-a3-rg` (create new) |
+| Name | `cse3cwa-a3-<yourname>` → becomes `cse3cwa-a3-<yourname>.azurewebsites.net` |
 | Publish | **Code** |
 | Runtime stack | **Node 22 LTS** |
 | Operating System | **Linux** |
@@ -116,14 +116,14 @@ Leave **WEBSITES_PORT** unset — App Service injects `PORT` and the server read
 **Web App → Deployment → Deployment Center**:
 
 1. **Source: GitHub** → Authorise if prompted.
-2. Choose the organisation/account, the `ai-capsule` repository and the `main` branch.
+2. Choose the organisation/account, the `CSE3CWA-Assessment-3` repository and the `main` branch.
 3. **Save**. Azure adds a GitHub Actions workflow and starts the first deployment.
 
 Or skip the Portal and deploy with the Azure CLI:
 
 ```bash
 az login
-az webapp up --name ai-capsule-<yourname> --resource-group ai-capsule-rg --runtime "NODE:22-lts"
+az webapp up --name cse3cwa-a3-<yourname> --resource-group cse3cwa-a3-rg --runtime "NODE:22-lts"
 ```
 
 Watch progress under **Deployment → Deployment Center → Logs**. The first build takes a few minutes.
@@ -139,12 +139,12 @@ GitHub must be told to accept it.
 
 **GitHub → Settings → Developer settings → OAuth apps → AI Capsule → Edit**:
 
-- **Homepage URL**: `https://ai-capsule-<yourname>.azurewebsites.net`
+- **Homepage URL**: `https://cse3cwa-a3-<yourname>.azurewebsites.net`
 - **Authorization callback URL** — click **Add callback URL** and keep the localhost one:
 
 ```
 http://localhost:5173/auth/github/callback
-https://ai-capsule-<yourname>.azurewebsites.net/auth/github/callback
+https://cse3cwa-a3-<yourname>.azurewebsites.net/auth/github/callback
 ```
 
 Update the application. **Leave wildcard matching disabled** — exact matching only.
@@ -157,7 +157,7 @@ Update the application. **Leave wildcard matching disabled** — exact matching 
 ## 7. Verify the deployment
 
 ```bash
-APP=https://ai-capsule-<yourname>.azurewebsites.net
+APP=https://cse3cwa-a3-<yourname>.azurewebsites.net
 
 curl -i $APP/api/health
 # expect: HTTP/2 200   and   {"status":"ok"}

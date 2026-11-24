@@ -17,9 +17,9 @@ layer, not in the browser.
 
 | | |
 |---|---|
-| **Public URL** | `https://ai-capsule-<yourname>.azurewebsites.net` ← replace with your deployed URL |
+| **Public URL** | `https://cse3cwa-a3-<yourname>.azurewebsites.net` ← replace with your deployed URL |
 | **Platform** | Microsoft Azure App Service (Linux, Node 22) |
-| **Health check** | `https://ai-capsule-<yourname>.azurewebsites.net/api/health` |
+| **Health check** | `https://cse3cwa-a3-<yourname>.azurewebsites.net/api/health` |
 
 > A localhost-only copy does not demonstrate the assessed cloud requirements, so the deployed URL
 > above is the primary evidence. The deployment steps that produced it are in
@@ -248,7 +248,7 @@ Both commands target the deployed `GET /api/capsules` endpoint.
 **Test 1 — no authentication**
 
 ```bash
-curl -i https://ai-capsule-<yourname>.azurewebsites.net/api/capsules
+curl -i https://cse3cwa-a3-<yourname>.azurewebsites.net/api/capsules
 ```
 
 Result (run locally against the same code path; this test is repeated against the deployed URL and
@@ -264,7 +264,7 @@ Content-Type: application/json; charset=utf-8
 **Test 2 — fake / invalid JWT**
 
 ```bash
-curl -i -H "Cookie: token=fake-token-123" https://ai-capsule-<yourname>.azurewebsites.net/api/capsules
+curl -i -H "Cookie: token=fake-token-123" https://cse3cwa-a3-<yourname>.azurewebsites.net/api/capsules
 ```
 
 Result:
@@ -284,7 +284,7 @@ token, so `jwt.verify` rejects it. Both cases are covered by automated tests in
 **Public health check**
 
 ```bash
-curl -i https://ai-capsule-<yourname>.azurewebsites.net/api/health
+curl -i https://cse3cwa-a3-<yourname>.azurewebsites.net/api/health
 # {"status":"ok"}
 ```
 
