@@ -1,0 +1,40 @@
+# Render blueprint for AI Capsule.
+#
+# Deploying with this file: Render Dashboard -> New -> Blueprint -> pick this
+# repository. Render reads these settings instead of you filling in the form.
+#
+# You can also create the service manually and copy these values by hand; see
+# RENDER_DEPLOY.md for the step-by-step version.
+
+services:
+  - type: web
+    name: cse3cwa-a3-ai-capsule
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    # The root build script installs backend/ and frontend/, then builds the
+    # React app into frontend/dist - which Express then serves.
+    buildCommand: npm run build
+    startCommand: npm start
+    # Public endpoint the platform polls to confirm the service came up.
+    healthCheckPath: /api/health
+    envVars:
+      # Pin Node so the sqlite3 prebuilt binary matches.
+      - key: NODE_VERSION
+        value: '22'
+      # Enables Secure cookies. Render terminates TLS in front of the app.
+      - key: NODE_ENV
+        value: production
+      # Render generates and stores this for you - never typed by hand.
+      - key: JWT_SECRET
+        generateValue: true
+      # sync: false means Render prompts for these in the dashboard.
+      - key: GITHUB_CLIENT_ID
+        sync: false
+      - key: GITHUB_CLIENT_SECRET
+        sync: false
+      # DATABASE_PATH is deliberately NOT set. It falls back to
+      # backend/data/capsules.db inside the service directory, which is writable
+      # but EPHEMERAL - the file is lost on restart, redeploy or spin-down.
+      # That trade-off is documented in the README.

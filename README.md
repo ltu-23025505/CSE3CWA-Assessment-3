@@ -17,13 +17,13 @@ layer, not in the browser.
 
 | | |
 |---|---|
-| **Public URL** | `https://cse3cwa-a3-<yourname>.azurewebsites.net` ← replace with your deployed URL |
-| **Platform** | Microsoft Azure App Service (Linux, Node 22) |
-| **Health check** | `https://cse3cwa-a3-<yourname>.azurewebsites.net/api/health` |
+| **Public URL** | `https://cse3cwa-a3-ai-capsule.onrender.com` ← replace with your deployed URL |
+| **Platform** | Render (free web service, Node 22) |
+| **Health check** | `https://cse3cwa-a3-ai-capsule.onrender.com/api/health` |
 
 > A localhost-only copy does not demonstrate the assessed cloud requirements, so the deployed URL
 > above is the primary evidence. The deployment steps that produced it are in
-> [`AZURE_DEPLOY.md`](AZURE_DEPLOY.md).
+> [`RENDER_DEPLOY.md`](RENDER_DEPLOY.md).
 
 ---
 
@@ -57,7 +57,7 @@ npm run build           # installs both, builds the React app into frontend/dist
 npm start               # Express serves the API *and* the built frontend on PORT
 ```
 
-Then open **http://localhost:3001**. This is the same shape Azure App Service uses: one origin, no
+Then open **http://localhost:3001**. This is the same shape Render uses: one origin, no
 CORS, no cross-origin cookie configuration. If `frontend/dist` does not exist the API still runs,
 but the pages will 404 — run `npm run build` first.
 
@@ -72,12 +72,12 @@ cd backend && npm test  # 42 API and security checks against a throwaway databas
 ## 3. Architecture
 
 ```
-Browser ──HTTPS──> Azure App Service (single origin)
+Browser ──HTTPS──> Render web service (single origin)
                      ├── /api/*    Express JSON API   (requireAuth on /api/capsules)
                      ├── /auth/*   OAuth redirect and callback
                      └── /*        built React SPA + history fallback
                                         │
-                                        └── SQLite file on the persistent /home mount
+                                        └── SQLite file in the service directory (ephemeral)
 ```
 
 Serving the frontend and API from **one origin** is deliberate and is what the brief recommends: it
@@ -86,7 +86,8 @@ default of `Lax`.
 
 ```
 ai-capsule/
-├── package.json                      # root build/start contract used by Azure
+├── package.json                      # root build/start contract used by the platform
+├── render.yaml                       # Render blueprint: plan, build, start, env vars
 ├── .env.example                      # environment variable NAMES with placeholders
 ├── backend/
 │   ├── server.js                     # app wiring, static serving, SPA fallback, error handler
@@ -173,9 +174,9 @@ browser and never reused, so GitHub's 8-hour token expiry has no effect on this 
   `401 { "error": "Unauthorized" }`, so the client cannot tell *why* it was rejected. The real
   reason is logged server-side. A request that fails is never able to return capsule data.
 
-`app.set('trust proxy', 1)` is required on Azure: App Service terminates TLS and forwards the
-request over HTTP, so without it Express would not set `Secure` cookies and every request after login
-would 401.
+`app.set('trust proxy', 1)` is required on Render: the platform terminates TLS at its proxy and
+forwards the request over HTTP, so without it Express would not set `Secure` cookies and every request
+after login would 401.
 
 ---
 
@@ -208,11 +209,15 @@ DELETE FROM capsules         WHERE id = ? AND user_id = ?
 There is no application-level filtering to forget, and no code path that can return another user's
 row. A foreign record is indistinguishable from a missing one: both return `404`.
 
-**Persistence:** the database file location comes from `DATABASE_PATH`. On Azure it is set to
-`/home/data/capsules.db`. The App Service `/home` mount is **persistent** across restarts and
-redeploys, and it sits outside `wwwroot` so a redeploy cannot overwrite it. Storage is therefore
-persistent for the life of the App Service instance — but it is **not** a managed database, so a
-platform-level reset or a move to multiple instances would require Postgres instead (see section 10).
+**Persistence — read this before assuming data survives:** the database file location comes from
+`DATABASE_PATH`. On Render it is deliberately **not set**, so the database falls back to
+`backend/data/capsules.db` inside the service directory.
+
+That location is writable but **ephemeral**. Render's free plan has no persistent disk, so the SQLite
+file is erased whenever the service restarts, redeploys, or spins down after 15 minutes of no traffic.
+The dashboard therefore starts empty after a cold start. The brief anticipates this trade-off and asks
+for it to be documented rather than engineered around — Postgres would be the fix, and would also be
+required for multiple instances (see section 10).
 
 ---
 
@@ -225,8 +230,9 @@ Names only — no values appear anywhere in this repository.
 | `JWT_SECRET` | Yes | Signs and verifies the application JWT. Long random string |
 | `GITHUB_CLIENT_ID` | Yes | GitHub OAuth App client ID |
 | `GITHUB_CLIENT_SECRET` | Yes | GitHub OAuth App client secret |
-| `DATABASE_PATH` | On Azure | SQLite file path (`/home/data/capsules.db`). Defaults to `backend/data/capsules.db` |
-| `NODE_ENV` | On Azure | `production` enables `Secure` cookies |
+| `DATABASE_PATH` | No | Overrides the SQLite file path. Left **unset** on Render so it falls back to `backend/data/capsules.db` (ephemeral) |
+| `NODE_ENV` | On Render | `production` enables `Secure` cookies |
+| `NODE_VERSION` | On Render | Pins the Node major version (`22`) so the `sqlite3` binary matches |
 | `PORT` | No | Set by the platform. Defaults to 3001 |
 | `APP_URL` | No | Overrides the derived OAuth callback base URL |
 
@@ -248,7 +254,7 @@ Both commands target the deployed `GET /api/capsules` endpoint.
 **Test 1 — no authentication**
 
 ```bash
-curl -i https://cse3cwa-a3-<yourname>.azurewebsites.net/api/capsules
+curl -i https://cse3cwa-a3-ai-capsule.onrender.com/api/capsules
 ```
 
 Result (run locally against the same code path; this test is repeated against the deployed URL and
@@ -264,7 +270,7 @@ Content-Type: application/json; charset=utf-8
 **Test 2 — fake / invalid JWT**
 
 ```bash
-curl -i -H "Cookie: token=fake-token-123" https://cse3cwa-a3-<yourname>.azurewebsites.net/api/capsules
+curl -i -H "Cookie: token=fake-token-123" https://cse3cwa-a3-ai-capsule.onrender.com/api/capsules
 ```
 
 Result:
@@ -284,7 +290,7 @@ token, so `jwt.verify` rejects it. Both cases are covered by automated tests in
 **Public health check**
 
 ```bash
-curl -i https://cse3cwa-a3-<yourname>.azurewebsites.net/api/health
+curl -i https://cse3cwa-a3-ai-capsule.onrender.com/api/health
 # {"status":"ok"}
 ```
 
@@ -316,17 +322,18 @@ reload, updates and deletes a record, and shows a second user an empty list.
 
 ## 10. One honest limitation
 
-**The session is issued once and never refreshed, and storage is instance-bound.**
+**The session is issued once and never refreshed, and storage is ephemeral.**
 
 The application JWT is a fixed 7-day token with no refresh mechanism, and it cannot be revoked
 before it expires — signing out clears the cookie, but a copy of the token taken before sign-out
 would remain valid until expiry. The OAuth flow also omits PKCE, which GitHub now recommends.
 
-The same class of limitation applies to storage: SQLite is persistent on the App Service `/home`
-mount, but it is a single local file with no replication or backup, and it is tied to one instance.
-Scaling the app to multiple instances, or losing the mount, would lose or diverge data. A managed
-database such as Postgres would be the correct fix for anything beyond a single-instance assessment
-deployment.
+The same class of limitation applies more sharply to storage. On Render's free plan the filesystem is
+**ephemeral**: the SQLite file is a single local file with no replication and no backup, and it is
+erased on every restart, redeploy and idle spin-down. Records therefore do not survive the instance
+being recycled — CRUD works correctly on every visit, but the data does not persist between them. A
+managed database such as Postgres would fix both the durability and the multi-instance problem, at the
+cost of a network round trip per query and a service to manage.
 
 ---
 
@@ -346,8 +353,8 @@ tests described in section 9.
    callback URL is derived from the incoming host, the redirect would have pointed at the backend
    port (`localhost:3001`) instead of the page origin, so sign-in would land on the wrong origin in
    development. I removed `changeOrigin` so the original host survives the hop, which keeps the
-   callback correct locally and on Azure with no extra setting.
-2. **`trust proxy` was missing behind the Azure reverse proxy.** Azure terminates TLS and forwards
+   callback correct locally and on Render with no extra setting.
+2. **`trust proxy` was missing behind the platform reverse proxy.** Render terminates TLS and forwards
    plain HTTP, so without `app.set('trust proxy', 1)` Express refuses to set `Secure` cookies. The
    symptom is a login that appears to succeed and then 401s on every subsequent request — a confusing
    failure to debug after deployment, which is why it is handled in the code and documented above.
@@ -388,7 +395,8 @@ behaviour is identical in both cases.
 | File | Purpose |
 |---|---|
 | `README.md` | This document |
-| `AZURE_DEPLOY.md` | Reproducible deployment steps for Azure App Service |
+| `RENDER_DEPLOY.md` | Reproducible deployment steps for Render |
+| `render.yaml` | Render blueprint: plan, build/start commands and environment variables |
 | `VIDEO_SCRIPT.md` | Shot list for the 3–5 minute demonstration |
 | `backend/tests/api.test.js` | 42 API and security checks |
 | `docs/superpowers/specs/2026-11-23-ai-capsule-design.md` | Design specification written before implementation |

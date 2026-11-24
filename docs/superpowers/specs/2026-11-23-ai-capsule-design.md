@@ -401,3 +401,28 @@ CREATE; no seed data is inserted.
 8. README + AI-use statement + `VIDEO_SCRIPT.md`
 9. Push to GitHub, deploy to Azure, register the production callback URL
 10. Deployed verification (Section 10 D), record the video, ZIP, submit
+
+---
+
+## 14. Change record
+
+**2026-11-24 — deployment platform changed from Azure App Service to Render.**
+
+*Why:* Azure for Students signup completed successfully, but Render was chosen instead to avoid
+depending on student-eligibility verification remaining valid through the marking period.
+
+*What changed:* the deployment target only. The application code required **no** change — it derives
+the OAuth callback URL from the incoming request and reads its configuration from environment
+variables, so it runs unmodified on either platform. `AZURE_DEPLOY.md` was replaced by
+`RENDER_DEPLOY.md` and a `render.yaml` blueprint was added.
+
+*One consequence to note:* Azure App Service's `/home` mount is persistent, whereas Render's free plan
+has **no persistent disk**. The SQLite database is therefore **ephemeral** on Render — erased on every
+restart, redeploy and 15-minute idle spin-down. Section 5's storage decision is unchanged (SQLite
+remains appropriate for the assignment), but the storage characteristic moves from *persistent* to
+*ephemeral*, and the brief explicitly asks for that to be documented as a limitation.
+
+*Deployment hardening found while switching:* the root `build` script now installs with
+`--include=dev`. npm omits `devDependencies` when `NODE_ENV=production`, and Vite plus the React plugin
+are dev dependencies — without this the platform's build step would fail to find Vite. This applies to
+any host that builds with `NODE_ENV=production`.
