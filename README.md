@@ -232,7 +232,7 @@ Names only — no values appear anywhere in this repository.
 | `GITHUB_CLIENT_SECRET` | Yes | GitHub OAuth App client secret |
 | `DATABASE_PATH` | No | Overrides the SQLite file path. Left **unset** on Render so it falls back to `backend/data/capsules.db` (ephemeral) |
 | `NODE_ENV` | On Render | `production` enables `Secure` cookies |
-| `NODE_VERSION` | On Render | Pins the Node major version (`22`) so the `sqlite3` binary matches |
+| `NODE_VERSION` | On Render | Pins the Node major version (`22`) so the `sqlite3` prebuilt binary matches |
 | `PORT` | No | Set by the platform. Defaults to 3001 |
 | `APP_URL` | No | Overrides the derived OAuth callback base URL |
 
@@ -358,6 +358,22 @@ tests described in section 9.
    plain HTTP, so without `app.set('trust proxy', 1)` Express refuses to set `Secure` cookies. The
    symptom is a login that appears to succeed and then 401s on every subsequent request — a confusing
    failure to debug after deployment, which is why it is handled in the code and documented above.
+3. **The first cloud deploy crashed on a native-module glibc mismatch; the version pin was the fix.**
+   The backend was originally on `sqlite3@^6`. Its prebuilt binary is compiled against a newer glibc
+   than the host runtime provides, so the deployed service died at startup with:
+
+   ```
+   Error: /lib/x86_64-linux-gnu/libm.so.6: version `GLIBC_2.38' not found
+   (required by .../node_modules/sqlite3/build/Release/node_sqlite3.node)
+   ```
+
+   The package's release history explains it: the 5.1.x series deliberately protected binary
+   compatibility — v5.1.4 *"Fixed glibc compatibility by downgrading CI to Ubuntu 20"* and v5.1.6
+   *"Fixed glibc compatibility by hardcoding lower version for `log2`"* — while v6.0.0 *"modernised
+   CI"* and dropped that work (the repository was then archived as unmaintained). Pinning to
+   `sqlite3@^5.1.7` restores a prebuilt binary built against an older glibc. It is ABI-stable
+   (`napi_versions: [3, 6]`), so one binary serves every supported Node version, and the full
+   42-check suite was re-run against the pinned driver before redeploying.
 
 ### How OAuth, JWT verification and protected API behaviour were verified
 

@@ -165,6 +165,18 @@ For the "cloud runtime/settings" evidence, record:
 
 ---
 
+## 7a. Troubleshooting
+
+| Symptom | Cause and fix |
+|---|---|
+| `version 'GLIBC_2.38' not found (required by .../sqlite3/build/Release/node_sqlite3.node)` | Only affects `sqlite3` v6+, whose prebuilt binary targets a newer glibc than the runtime. This project is pinned to `^5.1.7`, which ships a binary built for older glibc. If it ever reappears, confirm `backend/package.json` still pins `^5.1.7` and that `backend/package-lock.json` is committed. |
+| Site loads but pages 404, while `/api/health` works | The frontend build step did not run. Check the deploy log for `npm run build`; the root `build` script installs with `--include=dev` because Vite is a dev dependency and npm omits those when `NODE_ENV=production`. |
+| `Missing required environment variable(s): ...` at startup | A variable from section 2 is not set. The server logs the missing names and exits. |
+| Login appears to work, then every request returns 401 | `NODE_ENV` is not `production`, or the URL is not `https://`, so the `Secure` cookie is dropped. |
+| Build fails to find `vite` | `--include=dev` was removed from the root build script. |
+
+---
+
 ## 8. Before submitting
 
 - [ ] Deployed URL opens over HTTPS and is not localhost
