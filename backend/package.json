@@ -1,0 +1,24 @@
+{
+  "name": "ai-capsule-backend",
+  "version": "1.0.0",
+  "description": "Express API, GitHub OAuth, JWT session and SQLite storage for AI Capsule",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --env-file=.env --watch server.js",
+    "test": "node tests/api.test.js"
+  },
+  "keywords": [
+    "express",
+    "jwt",
+    "oauth",
+    "sqlite"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "sqlite3": "^6.0.1"
+  }
+}

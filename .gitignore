@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Build output
+frontend/dist/
+frontend/build/
+
+# Secrets and local configuration - NEVER commit these
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# Database (recreated automatically on boot)
+backend/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# OS noise
+.DS_Store
+._*
+__MACOSX/
+
+# Editors
+.vscode/
+.idea/
+*.swp
