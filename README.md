@@ -18,12 +18,23 @@ layer, not in the browser.
 | | |
 |---|---|
 | **Public URL** | **https://cse3cwa-assessment-3-rziz.onrender.com** |
-| **Platform** | Render (free web service, Node 22) |
+| **Platform** | Render (free web service, Node 22, region Singapore) |
 | **Health check** | https://cse3cwa-assessment-3-rziz.onrender.com/api/health |
 
-> A localhost-only copy does not demonstrate the assessed cloud requirements, so the deployed URL
-> above is the primary evidence. The deployment steps that produced it are in
-> [`RENDER_DEPLOY.md`](RENDER_DEPLOY.md).
+A localhost-only copy would not demonstrate the assessed cloud requirements, so the deployed URL above
+is the primary evidence. How it is deployed:
+
+| Setting | Value |
+|---|---|
+| Build command | `npm run build` |
+| Start command | `npm start` → `node backend/server.js` |
+| Health check path | `/api/health` |
+| Plan | Free (no persistent disk — see section 10) |
+| Environment variables | `NODE_VERSION`, `NODE_ENV`, `JWT_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` (names only — see section 7) |
+| OAuth callback registered | `https://cse3cwa-assessment-3-rziz.onrender.com/auth/github/callback` |
+
+`render.yaml` in the repository root declares the same configuration as a blueprint. Any push to
+`main` triggers a rebuild and redeploy.
 
 ---
 
@@ -430,8 +441,6 @@ behaviour is identical in both cases.
 | File | Purpose |
 |---|---|
 | `README.md` | This document |
-| `RENDER_DEPLOY.md` | Reproducible deployment steps for Render |
 | `render.yaml` | Render blueprint: plan, build/start commands and environment variables |
-| `VIDEO_SCRIPT.md` | Shot list for the 3–5 minute demonstration |
 | `backend/tests/api.test.js` | 42 API and security checks |
 | `docs/superpowers/specs/2026-11-23-ai-capsule-design.md` | Design specification written before implementation |

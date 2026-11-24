@@ -4,7 +4,7 @@
 # repository. Render reads these settings instead of you filling in the form.
 #
 # You can also create the service manually and copy these values by hand; see
-# RENDER_DEPLOY.md for the step-by-step version.
+# the same settings are documented in the README.
 
 services:
   - type: web

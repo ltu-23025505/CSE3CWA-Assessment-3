@@ -94,7 +94,6 @@ ai-capsule/
 ├── .env.example                     # env var NAMES with placeholder values, no secrets
 ├── .gitignore
 ├── README.md
-├── VIDEO_SCRIPT.md
 ├── docs/superpowers/specs/2026-11-23-ai-capsule-design.md
 ├── backend/
 │   ├── package.json
@@ -299,8 +298,8 @@ single-origin production setup so cookies behave identically in both environment
 ## 9. Deployment plan — SUPERSEDED
 
 > **This section is retained only as a record of the original plan.** The assessment was ultimately
-> deployed to **Render**, not Azure — see the change record in section 14 and the live runbook
-> `RENDER_DEPLOY.md` in the repository. The Azure steps below were never executed beyond creating the
+> deployed to **Render**, not Azure — see the change record in section 14 and the deployment summary
+> in the README. The Azure steps below were never executed beyond creating the
 > student account.
 
 1. `git init`, push the project to a **public** GitHub repository (Deployment Center needs access).
@@ -385,7 +384,6 @@ the live Azure URL, captured in the video.
 |---|---|
 | Source ZIP | Project without `node_modules`, build folders or the SQLite file |
 | `README.md` | Deployed URL + platform; install/run commands; the mandated routes and how React talks to Express; OAuth provider and how the JWT is issued, stored and verified; environment-variable **names**; DB init, ownership storage, and whether storage is persistent; both cURL commands **with results**; one honest limitation |
-| `VIDEO_SCRIPT.md` | Shot-by-shot script covering every §13 requirement |
 | MP4 (3–5 min) | Deployed URL (not localhost), `/api/health`, both 401 cURL tests, OAuth login, full CRUD, cloud settings and env var names without secrets, storage/limitation explanation |
 | AI-use statement | Tool used, what it helped with, one problem found and corrected, how OAuth/JWT/protected-API and ownership were verified, one implementation decision explained |
 | AI acknowledgement form | Submitted via the LMS Assessments page |
@@ -408,7 +406,7 @@ CREATE; no seed data is inserted.
 5. Local API + security test suite (Section 10 A and B) — must pass before UI work
 6. Frontend: router, guard, `services/api.js`, pages, components, CSS
 7. Headless-browser UI pass (Section 10 C)
-8. README + AI-use statement + `VIDEO_SCRIPT.md`
+8. README + AI-use statement
 9. Push to GitHub, deploy to Azure, register the production callback URL
 10. Deployed verification (Section 10 D), record the video, ZIP, submit
 
@@ -423,8 +421,8 @@ depending on student-eligibility verification remaining valid through the markin
 
 *What changed:* the deployment target only. The application code required **no** change — it derives
 the OAuth callback URL from the incoming request and reads its configuration from environment
-variables, so it runs unmodified on either platform. `AZURE_DEPLOY.md` was replaced by
-`RENDER_DEPLOY.md` and a `render.yaml` blueprint was added.
+variables, so it runs unmodified on either platform. A `render.yaml` blueprint was added to declare
+the plan, build/start commands and environment variables.
 
 *One consequence to note:* Azure App Service's `/home` mount is persistent, whereas Render's free plan
 has **no persistent disk**. The SQLite database is therefore **ephemeral** on Render — erased on every

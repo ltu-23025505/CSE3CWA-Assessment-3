@@ -8,7 +8,7 @@ import react from '@vitejs/plugin-react';
 // changeOrigin is deliberately left off so the Host header survives the hop.
 // The OAuth callback URL is derived from that host, which keeps it correct both
 // locally (http://localhost:5173/...) and on the deployed host
-// (https://<service>.onrender.com/... - see RENDER_DEPLOY.md).
+// (https://<service>.onrender.com/...).
 export default defineConfig({
   plugins: [react()],
   server: {
