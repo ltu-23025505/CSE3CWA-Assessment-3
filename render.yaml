@@ -8,7 +8,10 @@
 
 services:
   - type: web
-    name: cse3cwa-a3-ai-capsule
+    # Deployed at https://cse3cwa-assessment-3-rziz.onrender.com
+    # The `-rziz` suffix is Render's uniqueness suffix for the *.onrender.com
+    # hostname; it is not part of the service's display name.
+    name: cse3cwa-assessment-3-rziz
     runtime: node
     plan: free
     region: singapore

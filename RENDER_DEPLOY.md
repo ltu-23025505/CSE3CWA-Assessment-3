@@ -46,7 +46,7 @@ record during the video so the marker sees real data.
 
 | Field | Value |
 |---|---|
-| Name | `cse3cwa-a3-ai-capsule` → becomes `https://cse3cwa-a3-ai-capsule.onrender.com` |
+| Name | `cse3cwa-assessment-3-rziz` → becomes `https://cse3cwa-assessment-3-rziz.onrender.com` |
 | Region | **Singapore** (closest to Australia) |
 | Branch | `main` |
 | Runtime | **Node** |
@@ -102,12 +102,12 @@ GitHub must be told to accept the Render hostname.
 
 **GitHub → Settings → Developer settings → OAuth apps → AI Capsule → Edit**:
 
-- **Homepage URL**: `https://cse3cwa-a3-ai-capsule.onrender.com`
+- **Homepage URL**: `https://cse3cwa-assessment-3-rziz.onrender.com`
 - **Authorization callback URL** — click **Add callback URL**, keeping the existing one:
 
 ```
 http://localhost:5173/auth/github/callback
-https://cse3cwa-a3-ai-capsule.onrender.com/auth/github/callback
+https://cse3cwa-assessment-3-rziz.onrender.com/auth/github/callback
 ```
 
 Update the application. **Leave wildcard matching disabled** — exact matching only.
@@ -117,7 +117,7 @@ Update the application. **Leave wildcard matching disabled** — exact matching 
 ## 5. Verify the deployment
 
 ```bash
-APP=https://cse3cwa-a3-ai-capsule.onrender.com
+APP=https://cse3cwa-assessment-3-rziz.onrender.com
 
 curl -i $APP/api/health
 # expect: HTTP/2 200   and   {"status":"ok"}

@@ -426,3 +426,18 @@ remains appropriate for the assignment), but the storage characteristic moves fr
 `--include=dev`. npm omits `devDependencies` when `NODE_ENV=production`, and Vite plus the React plugin
 are dev dependencies — without this the platform's build step would fail to find Vite. This applies to
 any host that builds with `NODE_ENV=production`.
+
+**2026-11-24 — first deploy failed on a native-module glibc mismatch; resolved by pinning.**
+
+The service came up but crashed loading `sqlite3`'s prebuilt binary with
+`version 'GLIBC_2.38' not found`. Cause: `sqlite3` v6 prebuilds are compiled against a newer glibc
+than the runtime provides, whereas the 5.1.x line deliberately preserves binary compatibility (v5.1.4
+downgraded its CI to Ubuntu 20; v5.1.6 hardcoded a lower symbol version for `log2`). v6.0.0
+"modernised CI" and dropped that work, and the repository was subsequently archived as unmaintained.
+Resolution: pin `sqlite3@^5.1.7`, whose `napi-v6` linux-x64 prebuild is ABI-stable across Node
+versions and targets the older glibc. The full test suite was re-run against the pinned driver before
+redeploying.
+
+**Deployed and verified:** `https://cse3cwa-assessment-3-rziz.onrender.com` — `/api/health` returns
+`{"status":"ok"}`, both unauthenticated `GET /api/capsules` checks return `401`, the React build is
+served, and the session cookie is issued `HttpOnly; Secure; SameSite=Lax` on the deployed host.

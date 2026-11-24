@@ -17,9 +17,9 @@ layer, not in the browser.
 
 | | |
 |---|---|
-| **Public URL** | `https://cse3cwa-a3-ai-capsule.onrender.com` ← replace with your deployed URL |
+| **Public URL** | **https://cse3cwa-assessment-3-rziz.onrender.com** |
 | **Platform** | Render (free web service, Node 22) |
-| **Health check** | `https://cse3cwa-a3-ai-capsule.onrender.com/api/health` |
+| **Health check** | https://cse3cwa-assessment-3-rziz.onrender.com/api/health |
 
 > A localhost-only copy does not demonstrate the assessed cloud requirements, so the deployed URL
 > above is the primary evidence. The deployment steps that produced it are in
@@ -249,20 +249,20 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 
 ## 8. Required cURL evidence
 
-Both commands target the deployed `GET /api/capsules` endpoint.
+Both commands below were run against the **deployed** URL; the output shown is the actual response
+from `https://cse3cwa-assessment-3-rziz.onrender.com`.
 
 **Test 1 — no authentication**
 
 ```bash
-curl -i https://cse3cwa-a3-ai-capsule.onrender.com/api/capsules
+curl -i https://cse3cwa-assessment-3-rziz.onrender.com/api/capsules
 ```
 
-Result (run locally against the same code path; this test is repeated against the deployed URL and
-shown in the video):
+Result (HTTP/2 over TLS, served by Render):
 
 ```
-HTTP/1.1 401 Unauthorized
-Content-Type: application/json; charset=utf-8
+HTTP/2 401
+content-type: application/json; charset=utf-8
 
 {"error":"Unauthorized"}
 ```
@@ -270,14 +270,14 @@ Content-Type: application/json; charset=utf-8
 **Test 2 — fake / invalid JWT**
 
 ```bash
-curl -i -H "Cookie: token=fake-token-123" https://cse3cwa-a3-ai-capsule.onrender.com/api/capsules
+curl -i -H "Cookie: token=fake-token-123" https://cse3cwa-assessment-3-rziz.onrender.com/api/capsules
 ```
 
 Result:
 
 ```
-HTTP/1.1 401 Unauthorized
-Content-Type: application/json; charset=utf-8
+HTTP/2 401
+content-type: application/json; charset=utf-8
 
 {"error":"Unauthorized"}
 ```
@@ -290,9 +290,28 @@ token, so `jwt.verify` rejects it. Both cases are covered by automated tests in
 **Public health check**
 
 ```bash
-curl -i https://cse3cwa-a3-ai-capsule.onrender.com/api/health
-# {"status":"ok"}
+curl -i https://cse3cwa-assessment-3-rziz.onrender.com/api/health
 ```
+
+Result:
+
+```
+HTTP/2 200
+content-type: application/json; charset=utf-8
+
+{"status":"ok"}
+```
+
+**Supporting evidence that the session cookie is configured correctly.** A `302` from
+`/auth/github` on the deployed service returns:
+
+```
+set-cookie: oauth_state=…; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax
+```
+
+`Secure` and `HttpOnly` present on the deployed host is what confirms `NODE_ENV=production` and
+`trust proxy` are both effective behind Render's TLS-terminating proxy — the exact combination whose
+absence would produce a login that appears to succeed and then 401s on every subsequent request.
 
 ---
 
