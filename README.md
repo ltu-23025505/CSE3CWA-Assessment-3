@@ -443,4 +443,3 @@ behaviour is identical in both cases.
 | `README.md` | This document |
 | `render.yaml` | Render blueprint: plan, build/start commands and environment variables |
 | `backend/tests/api.test.js` | 42 API and security checks |
-| `docs/superpowers/specs/2026-11-23-ai-capsule-design.md` | Design specification written before implementation |
