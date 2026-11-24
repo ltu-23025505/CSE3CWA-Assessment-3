@@ -16,7 +16,7 @@ function loadConfig(env = process.env) {
     console.error(`Missing required environment variable(s): ${missing.join(', ')}`);
     console.error('');
     console.error('Locally:  cp .env.example backend/.env  then fill it in and run `npm run dev:backend`.');
-    console.error('On Azure: add them under Configuration -> Application settings.');
+    console.error('On Render: add them under the service\'s Environment tab.');
     process.exit(1);
   }
 
@@ -27,18 +27,19 @@ function loadConfig(env = process.env) {
     githubClientId: env.GITHUB_CLIENT_ID,
     githubClientSecret: env.GITHUB_CLIENT_SECRET,
 
-    // Azure App Service: set DATABASE_PATH=/home/data/capsules.db so the file
-    // lives on the persistent mount instead of inside the deploy directory.
+    // Left unset on Render on purpose: it falls back to a file inside the service
+    // directory, which is writable but EPHEMERAL (no persistent disk on the free
+    // plan). Set it only when running locally or on a host with a persistent mount.
     databasePath: env.DATABASE_PATH || path.join(__dirname, 'data', 'capsules.db'),
 
     port,
 
-    // Secure cookies require HTTPS. Azure provides it; local dev does not.
+    // Secure cookies require HTTPS. The hosting platform provides it; local dev does not.
     isProduction: env.NODE_ENV === 'production',
 
     // Optional override for the OAuth callback base URL. When unset the callback
     // is derived from the incoming request, which is correct on both
-    // http://localhost:3001 and https://<app>.azurewebsites.net.
+    // http://localhost:3001 and the deployed host (https://<service>.onrender.com).
     appUrl: env.APP_URL || null,
   };
 }

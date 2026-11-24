@@ -7,6 +7,11 @@
 **Author:** Vammy Johannis Jiang
 **Date:** 2026-11-23
 
+> **Note on platform references.** This specification was written when the intended host was Azure App
+> Service. The application was ultimately deployed to **Render**, as recorded in section 14. Sections
+> that name Azure are retained as the original design record; sections 9 and 14 describe the actual
+> deployment. The application code itself was unaffected by the change — see section 14.
+
 ---
 
 ## 1. Goal
@@ -291,7 +296,12 @@ single-origin production setup so cookies behave identically in both environment
 
 ---
 
-## 9. Deployment plan (Azure)
+## 9. Deployment plan — SUPERSEDED
+
+> **This section is retained only as a record of the original plan.** The assessment was ultimately
+> deployed to **Render**, not Azure — see the change record in section 14 and the live runbook
+> `RENDER_DEPLOY.md` in the repository. The Azure steps below were never executed beyond creating the
+> student account.
 
 1. `git init`, push the project to a **public** GitHub repository (Deployment Center needs access).
 2. Sign up at `azure.microsoft.com/free/students` with the La Trobe email — **no credit card**.

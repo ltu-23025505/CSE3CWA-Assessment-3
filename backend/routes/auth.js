@@ -32,7 +32,7 @@ module.exports = function authRouter({ config }) {
   const router = express.Router();
 
   // The callback URL must exactly match one registered on the GitHub OAuth App.
-  // Deriving it from the request keeps localhost and Azure correct without an
+  // Deriving it from the request keeps localhost and Render correct without an
   // extra setting; APP_URL overrides it if ever needed.
   function callbackUrl(req) {
     const base = config.appUrl || `${req.protocol}://${req.get('host')}`;

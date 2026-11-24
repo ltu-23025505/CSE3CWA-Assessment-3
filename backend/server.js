@@ -20,9 +20,9 @@ const CLIENT_DIR = path.join(__dirname, '..', 'frontend', 'dist');
 function createApp({ config, db }) {
   const app = express();
 
-  // Azure terminates TLS at its proxy and forwards the request over HTTP.
+  // Render terminates TLS at its proxy and forwards the request over HTTP.
   // Trusting the first proxy hop is what makes req.protocol report https, which
-  // in turn lets Express set Secure cookies. Without this every login on Azure
+  // in turn lets Express set Secure cookies. Without this every login on Render
   // would appear to succeed and then 401 on the next request.
   app.set('trust proxy', 1);
   app.disable('x-powered-by');

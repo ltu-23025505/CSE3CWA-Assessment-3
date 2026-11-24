@@ -1,7 +1,9 @@
 // SQLite connection and schema initialisation.
 //
-// SQLite is the minimum storage the brief allows. The file lives outside the
-// deployment directory on Azure so redeploys cannot overwrite it.
+// SQLite is the minimum storage the brief allows, and it keeps the deployment to
+// a single web service. Note that on the free hosting plan the filesystem is
+// EPHEMERAL: the file is erased on restart, redeploy and idle spin-down, so
+// records do not survive the instance being recycled. See the README limitation.
 
 const fs = require('fs');
 const path = require('path');
